@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest # 최신 버전 공식 mongodb 이미지 사용
+    container_name: mongodb-container
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER} # 사용자
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD} # 비밀번호
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE} # DB 이름
+    ports:
+      - "${MONGO_PORT}:27017" # MongoDB 기본 포트
+    volumes:
+      - mongo_data:/data/db # 데이터 저장 경로
+    networks:
+      - data-pipeline-net
+    restart: always # 자동 재시작
+
+volumes:
+  mongo_data:
+    driver: local # 로컬에 데이터 저장
+
+networks:
+  data-pipeline-net:
+    external: true # 외부 네트워크 공유하여 사용

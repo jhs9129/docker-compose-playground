@@ -1,0 +1,25 @@
+version: "3"
+services:
+  zookeeper: # kafka 의존 서비스(메타 데이터 관리)
+    container_name: zookeeper-container
+    image: wurstmeister/zookeeper
+    ports:
+      - "${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}"
+    networks:
+      - data-pipeline-net
+
+  kafka: # kafka 서비스
+    container_name: kafka-container
+    image: wurstmeister/kafka
+    ports:
+      - "${KAFKA_PORT}:${KAFKA_PORT}" # 9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: ${KAFKA_ADVERTISED_HOST_NAME} # 호스트 IP 또는 도메인
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-container:${ZOOKEEPER_PORT} # Zookeeper 연결
+      KAFKA_CREATE_TOPICS: ${KAFKA_CREATE_TOPICS} # 컨테이너 처음 시작 시 토픽 생성 (예: my-topic:1:1 → 토픽명:파티션수:복제수)
+    networks:
+      - data-pipeline-net
+
+networks:
+  data-pipeline-net: # 서비스 간 통신 네트워크
+    driver: bridge
